@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+require "docopt"
+require_relative '../lib/examplify.rb'
+
+doc = <<DOCOPT
+Examplify
+
+Usage:
+  examplify <paths>... [--exclude=glob|--only=glob] [--dry-run]
+  examplify -h | --help
+  examplify --version
+
+Options:
+  -h --help        Show this screen.
+  --version        Show version.
+  -n --dry-run     Only output paths.
+  --exclude=glob   Glob pattern of files to exclude.
+  --only=glob      Glob pattern to filter files.
+
+DOCOPT
+
+begin
+  options = Docopt::docopt(doc)
+
+  list = Examplify.new(options["<paths>"])
+
+  list.filter(options["--only"])     if options["--only"]
+  list.exclude(options["--exclude"]) if options["--exclude"]
+
+  if options['--dry-run']
+    puts list.files
+  else
+    puts list.output
+  end
+
+rescue Docopt::Exit => e
+  puts e.message
+end
